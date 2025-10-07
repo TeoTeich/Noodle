@@ -1,0 +1,42 @@
+extends layout.pug 
+block variables
+  - var title = 'Онлайн-запись'
+
+block content
+  section.booking-form-section
+    .container
+      h2.section-title Запись на услуги в "Noodle"
+      p Выберите услугу, мастера и удобное для вас время.
+      
+      form#booking-form.booking-form(method='POST')
+        .form-group
+          label(for='service-select') Выберите услугу:
+          select#service-select(name='service', required, disabled)
+            option(value='') -- Загрузка услуг... --
+        
+        .form-group
+          label(for='master-select') Выберите мастера:
+          select#master-select(name='master', required, disabled)
+            option(value='') -- Выберите мастера --
+            
+        .form-group
+          label(for='booking-date') Выберите дату:
+          input#booking-date(type='date', name='date', required, disabled)
+          
+        .form-group
+          label Время записи:
+          .time-slots#time-slots
+            p.info-text Выберите дату, чтобы увидеть свободное время.
+            
+        .form-group
+          label(for='client-name') Ваше имя:
+          input#client-name(type='text', name='clientName', required)
+          
+        .form-group
+          label(for='client-phone') Телефон:
+          input#client-phone(type='tel', name='clientPhone', required)
+          
+        button.btn.btn-lg.btn-primary(type='submit', disabled)#submit-booking
+          | Записаться
+          
+      #status-message.hidden(aria-live='polite')

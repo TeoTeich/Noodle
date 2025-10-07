@@ -1,0 +1,43 @@
+extends layout.pug 
+block variables
+  - var title = 'Главная' 
+
+block content
+  section.hero
+    .container
+      h2.hero-title Стрижки, которые вдохновляют
+      p.hero-subtitle Запишитесь к лучшим мастерам прямо сейчас!
+      a(href='/booking.html').btn.btn-lg.btn-primary Записаться
+      
+  section#services.services
+    .container
+      h2.section-title Наши услуги
+      .service-cards
+        .card 
+          h3 Стрижка (женская/мужская)
+          p От 1500 руб.
+          a(href='/booking.html').btn.btn-sm Записаться
+          
+        .card
+          h3 Окрашивание
+          p Сложное от 5000 руб.
+          a(href='/booking.html').btn.btn-sm Записаться
+          
+        .card
+          h3 Уход и восстановление
+          p От 2000 руб.
+          a(href='/booking.html').btn.btn-sm Записаться
+          
+  section.about
+    .container
+      h2.section-title О салоне Noodle
+      .about-content
+        p Салон "Noodle" – это не просто парикмахерская, это место, где искусство стрижки встречается с индивидуальностью. Наши мастера постоянно проходят обучение, чтобы предложить вам самые актуальные техники и тренды.
+        p Мы работаем только с премиальными материалами и гарантируем качество. Ждем вас!
+        
+  section.contacts
+    .container
+      h2.section-title Наше расположение
+      p.address Казань, ул. Большая Красная, 55
+      p.phone Телефон: +7 (999) 999-99-99
+      p.time Режим работы: Ежедневно с 10:00 до 21:00
