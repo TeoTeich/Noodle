@@ -1,0 +1,37 @@
+doctype html
+html(lang='ru')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    block variables 
+    title Салон-парикмахерская Noodle | #{title}
+    
+    // Путь к статике: /css/style.css
+    link(rel='stylesheet', href='/css/style.css')
+  body
+    header.header
+      .container
+        h1.logo Noodle
+        nav.nav
+          ul
+            li: a(href='/') Главная
+            // Изменение: ссылка на секцию #services на главной странице
+            li: a(href='/#services') Услуги
+            li: a(href='/booking.html').btn.btn-primary Записаться онлайн
+    
+    main.main
+      // Блок для контента дочерних шаблонов
+      block content 
+      
+    footer.footer
+      .container
+        p &copy; 2025 Салон Noodle. Все права защищены.
+        .footer-contacts
+          a(href='#') Контакты
+          span |
+          a(href='#') Политика конфиденциальности
+          
+    // Подключение jQuery
+    script(src='https://code.jquery.com/jquery-3.6.0.min.js')
+    // Путь к статике: /js/app.js
+    script(src='/js/app.js')
