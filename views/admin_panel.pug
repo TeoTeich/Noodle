@@ -1,0 +1,10 @@
+extends layout.pug 
+block variables
+  - var title = 'Панель Администратора' 
+
+block content
+  section.admin-panel
+    .container
+      h2.section-title Панель Администратора
+      p Здесь можно управлять услугами, мастерами и просматривать все записи.    
+      a(href='/api/logout').btn.btn-danger Выйти

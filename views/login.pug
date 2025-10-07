@@ -1,0 +1,24 @@
+extends layout.pug 
+block variables
+  - var title = 'Вход в систему' 
+
+block content
+  section.login-form-section
+    .container
+      h2.section-title Вход в систему
+      p Используйте свой логин и пароль.
+      
+      // Блок для отображения ошибок или статуса
+      #status-message.hidden.error-message(aria-live='polite')
+      
+      form#login-form.booking-form(method='POST')
+        .form-group
+          label(for='username') Имя пользователя:
+          input#username(type='text', name='username', required)
+          
+        .form-group
+          label(for='password') Пароль:
+          input#password(type='password', name='password', required)
+          
+        button.btn.btn-lg.btn-primary(type='submit')
+          | Войти

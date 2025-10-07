@@ -15,10 +15,11 @@ html(lang='ru')
         nav.nav
           ul
             li: a(href='/') Главная
-            // Изменение: ссылка на секцию #services на главной странице
             li: a(href='/#services') Услуги
             li: a(href='/booking.html').btn.btn-primary Записаться онлайн
-    
+            // НОВАЯ ССЫЛКА
+            li: a(href='/register.html') Регистрация
+            li: a(href='/login.html') Вход 
     main.main
       // Блок для контента дочерних шаблонов
       block content 
@@ -35,3 +36,5 @@ html(lang='ru')
     script(src='https://code.jquery.com/jquery-3.6.0.min.js')
     // Путь к статике: /js/app.js
     script(src='/js/app.js')
+    // НОВЫЙ СКРИПТ АВТОРИЗАЦИИ (для страниц с формами входа/регистрации)
+    script(src='/js/auth.js') 

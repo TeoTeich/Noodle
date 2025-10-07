@@ -1,0 +1,13 @@
+extends layout.pug 
+block variables
+  - var title = 'Кабинет Мастера' 
+
+block content
+  section.cabinet
+    .container
+      h2.section-title Добро пожаловать, #{username}!
+      p Это ваш личный кабинет. Здесь вы можете просмотреть свое расписание и статистику.
+      
+      // Здесь будет логика отображения расписания Мастера
+      
+      a(href='/api/logout').btn.btn-danger Выйти

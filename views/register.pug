@@ -1,0 +1,36 @@
+extends layout.pug 
+block variables
+  - var title = 'Регистрация' 
+
+block content
+  section.register-form-section
+    .container
+      h2.section-title Регистрация клиента
+      p Зарегистрируйтесь, чтобы ускорить процесс онлайн-записи.
+      
+      // Блок для отображения ошибок или статуса
+      #status-message.hidden.error-message(aria-live='polite')
+      
+      form#register-form.booking-form(method='POST')
+        // Добавьте поля, которые вы хотите сохранить для клиента (например, имя и телефон)
+        
+        .form-group
+          label(for='reg-username') Логин (будет использоваться для входа):
+          input#reg-username(type='text', name='username', required)
+          
+        .form-group
+          label(for='reg-password') Пароль:
+          input#reg-password(type='password', name='password', required)
+          
+        hr 
+        
+        .form-group
+          label(for='reg-name') Ваше Имя:
+          input#reg-name(type='text', name='name', required)
+          
+        .form-group
+          label(for='reg-phone') Телефон:
+          input#reg-phone(type='tel', name='phone', required)
+          
+        button.btn.btn-lg.btn-primary(type='submit')
+          | Зарегистрироваться
