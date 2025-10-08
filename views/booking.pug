@@ -7,6 +7,7 @@ block content
     .container
       h2.section-title Запись на услуги в "Noodle"
       p Выберите услугу, мастера и удобное для вас время.
+      p Вы записываетесь как #[strong #{username}].
       
       form#booking-form.booking-form(method='POST')
         .form-group
@@ -27,16 +28,14 @@ block content
           label Время записи:
           .time-slots#time-slots
             p.info-text Выберите дату, чтобы увидеть свободное время.
-            
-        .form-group
-          label(for='client-name') Ваше имя:
-          input#client-name(type='text', name='clientName', required)
-          
-        .form-group
-          label(for='client-phone') Телефон:
-          input#client-phone(type='tel', name='clientPhone', required)
           
         button.btn.btn-lg.btn-primary(type='submit', disabled)#submit-booking
           | Записаться
           
       #status-message.hidden(aria-live='polite')
+
+block append scripts
+    // 1. Общие API функции
+    script(src='/js/api.js') 
+    // 2. Клиентская логика
+    script(src='/js/app.js')

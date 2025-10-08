@@ -1,0 +1,12 @@
+extends layout.pug 
+block variables
+  - var title = 'Ошибка' 
+
+block content
+  section.error-page
+    .container
+      h2.section-title Ошибка
+      // Переменная 'message' передается из server.js
+      p.error-message #{message}
+      
+      a(href='/').btn.btn-primary.mt-4 Вернуться на главную

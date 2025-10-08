@@ -1,0 +1,15 @@
+extends layout.pug 
+block variables
+  - var title = 'Мои записи' 
+
+block content
+  section.cabinet
+    .container
+      h2.section-title Здравствуйте, #{username}!
+      h3.section-subtitle Ваши предстоящие записи
+      
+      #bookings-list.table-responsive
+        p.loading Загрузка ваших записей...
+      
+      a(href='/booking.html').btn.btn-primary.mt-4 Записаться снова
+      a(href='/api/logout').btn.btn-danger.ml-3 Выйти

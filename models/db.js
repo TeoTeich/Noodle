@@ -1,7 +1,7 @@
 // models/db.js
 
 const mysql = require('mysql2/promise');
-require('dotenv').config(); // Для загрузки переменных из .env
+require('dotenv').config();
 
 // Создание пула подключений к базе данных
 const pool = mysql.createPool({
@@ -11,19 +11,9 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    // Даты и время будут возвращаться как строки ('YYYY-MM-DD', 'HH:MM:SS')
+    dateStrings: true 
 });
 
-// Проверка подключения при запуске
-pool.getConnection()
-    .then(connection => {
-        console.log('✅ Успешное подключение к MySQL!');
-        connection.release();
-    })
-    .catch(err => {
-        console.error('❌ Ошибка подключения к MySQL:', err.message);
-        console.error('Проверьте ваш файл .env и настройки MySQL.');
-    });
-
-// Экспортируем пул для выполнения запросов в других модулях
 module.exports = pool;

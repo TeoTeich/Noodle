@@ -5,9 +5,11 @@ block variables
 block content
   section.cabinet
     .container
-      h2.section-title Добро пожаловать, #{username}!
-      p Это ваш личный кабинет. Здесь вы можете просмотреть свое расписание и статистику.
+      h2.section-title Кабинет Мастера: #{username}
+      h3.section-subtitle Ваше расписание
       
-      // Здесь будет логика отображения расписания Мастера
+      #bookings-list.table-responsive
+        p.loading Загрузка вашего расписания...
       
-      a(href='/api/logout').btn.btn-danger Выйти
+      a(href='/api/logout').btn.btn-danger.ml-3 Выйти
+      

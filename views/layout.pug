@@ -6,22 +6,38 @@ html(lang='ru')
     block variables 
     title Салон-парикмахерская Noodle | #{title}
     
-    // Путь к статике: /css/style.css
     link(rel='stylesheet', href='/css/style.css')
+    
+    // 1. jQuery должен загружаться здесь или первым в блоке scripts
+    script(src='https://code.jquery.com/jquery-3.6.0.min.js') 
+    
   body
     header.header
       .container
         h1.logo Noodle
         nav.nav
           ul
-            li: a(href='/') Главная
-            li: a(href='/#services') Услуги
-            li: a(href='/booking.html').btn.btn-primary Записаться онлайн
-            // НОВАЯ ССЫЛКА
-            li: a(href='/register.html') Регистрация
-            li: a(href='/login.html') Вход 
+            li: a(href='/index.html') Главная
+            li: a(href='#services') Услуги
+            
+            // --- УСЛОВНАЯ ССЫЛКА НА КАБИНЕТ ---
+            if role === 'client'
+              li: a(href='/my_bookings.html') Мои записи
+            else if role === 'master'
+              li: a(href='/master_cabinet.html') Кабинет Мастера
+            else if role === 'admin'
+              li: a(href='/admin.html') Панель Администратора
+            // ----------------------------------
+              
+            li: a(href='/booking.html').btn.btn-primary Записаться
+            
+            if !isLoggedIn
+              li: a(href='/register.html') Регистрация
+              li: a(href='/login.html') Вход 
+            else
+              li: a(href='/api/logout') Выход
+
     main.main
-      // Блок для контента дочерних шаблонов
       block content 
       
     footer.footer
@@ -31,10 +47,9 @@ html(lang='ru')
           a(href='#') Контакты
           span |
           a(href='#') Политика конфиденциальности
-          
-    // Подключение jQuery
-    script(src='https://code.jquery.com/jquery-3.6.0.min.js')
-    // Путь к статике: /js/app.js
+
+    // 2. Блок scripts для пользовательских скриптов
+    block scripts 
     script(src='/js/app.js')
-    // НОВЫЙ СКРИПТ АВТОРИЗАЦИИ (для страниц с формами входа/регистрации)
     script(src='/js/auth.js') 
+    script(src='/js/schedule.js')
