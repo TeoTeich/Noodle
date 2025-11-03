@@ -1,0 +1,23 @@
+extends layout
+
+block content
+    .hero(style='text-align: center; padding: 50px 0; background: #e0f7fa;')
+        h1 Добро пожаловать в Noodle!
+        p Салон красоты, где ваша красота — наша забота.
+    
+    .container
+        .services-section
+            h2 Наши Услуги
+            if services && services.length
+                .service-list
+                    each service in services
+                        .service-card(style='margin-bottom: 20px; padding: 15px; border: 1px solid #eee;')
+                            h3= service.name
+                            p.price Цена: #{service.price} руб.
+                            p.duration Длительность: #{service.duration_min} мин.
+                            if user
+                                a.button(href=`/client/book?serviceId=${service.id}`) Записаться
+                            else
+                                a.button(href=`/login?returnTo=/client/book?serviceId=${service.id}`) Войти, чтобы записаться
+            else
+                p Услуги пока не добавлены.

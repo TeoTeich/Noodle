@@ -1,0 +1,29 @@
+extends layout
+
+block content
+    .auth-form
+        h2 Регистрация нового клиента
+        if error
+            .error-message= error
+            
+        form(action='/register', method='POST')
+            .form-group
+                label(for='name') Ваше Имя
+                input#name(type='text', name='name', required)
+            
+            .form-group
+                label(for='phone') Телефон
+                input#phone(type='tel', name='phone', placeholder='9991234567', required)
+            
+            .form-group
+                label(for='username') Имя пользователя (Логин)
+                input#username(type='text', name='username', required)
+            
+            .form-group
+                label(for='password') Пароль
+                input#password(type='password', name='password', required)
+            
+            button(type='submit') Зарегистрироваться
+        
+        p Уже есть аккаунт? 
+            a(href='/login') Войти

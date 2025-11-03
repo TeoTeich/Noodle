@@ -1,0 +1,22 @@
+extends layout
+
+block content
+    .auth-form
+        h2 Вход
+        if error
+            .error-message= error
+        
+        form(action='/login', method='POST')
+            input(type='hidden', name='returnTo', value=returnTo) 
+            .form-group
+                label(for='username') Имя пользователя
+                input#username(type='text', name='username', required)
+            
+            .form-group
+                label(for='password') Пароль
+                input#password(type='password', name='password', required)
+            
+            button(type='submit') Войти
+        
+        p Нет аккаунта? 
+            a(href='/register') Зарегистрироваться

@@ -1,0 +1,7 @@
+extends layout
+
+block content
+    .container(style='text-align: center; color: #c0392b;')
+        h1= title || 'Ошибка'
+        p= message || 'Произошла ошибка.'
+        a(href='/') Вернуться на главную

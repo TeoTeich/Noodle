@@ -1,0 +1,13 @@
+extends ../layout
+
+block content
+    .container
+        h2 Административная панель
+        p Вы успешно авторизованы как #{user.role}.
+        
+        .admin-menu
+            h3 Меню
+            ul
+                li: a(href='/admin/services') Управление Услугами
+                li: a(href='/admin/appointments') Управление Записями
+                // Можно добавить ссылки на управление пользователями и мастерами

@@ -1,0 +1,13 @@
+extends ../layout
+
+block content
+    .container
+        h2 Личный кабинет Клиента
+        p Вы успешно авторизованы как #{user.role}.
+        if message
+            .success-message= message
+        
+        h3 Ваши предстоящие записи
+        p Здесь будет список ваших записей.
+        
+        a.button(href='/client/book') Записаться на новую услугу
