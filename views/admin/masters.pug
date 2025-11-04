@@ -1,0 +1,82 @@
+extends ../layout
+
+block content
+    .container
+        h2 Управление Мастерами
+        
+        if message
+            .success-message(style='padding: 10px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; margin-bottom: 20px;')= message
+        if error
+            .error-message(style='padding: 10px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; margin-bottom: 20px;')= error
+
+        // ----------------------------------------
+        // 1. ФОРМА ДОБАВЛЕНИЯ МАСТЕРА
+        // ----------------------------------------
+        .card(style='margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 5px;')
+            h3 Добавить нового мастера (повысить роль)
+            p.note Введите логин **уже существующего** пользователя, чтобы назначить его мастером.
+            form(action='/admin/masters/add', method='POST')
+                .form-group
+                    label(for='username') Логин пользователя (Username)
+                    input#username(type='text', name='username', required)
+                .form-group
+                    label(for='specialization') Специализация
+                    input#specialization(type='text', name='specialization', required)
+                
+                button.button(type='submit', style='background: #3498db; color: white;') Назначить Мастером
+
+        // ----------------------------------------
+        // 2. СПИСОК МАСТЕРОВ
+        // ----------------------------------------
+        .card
+            h3 Список всех мастеров
+            table.data-table(style='width: 100%; border-collapse: collapse; margin-top: 20px;')
+                thead
+                    tr
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') ID Мастера
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Имя
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Логин
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Телефон
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Специализация
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Действия
+                tbody
+                    if masters && masters.length
+                        each master in masters
+                            - const modalId = 'editMasterModal' + master.master_id
+                            tr
+                                td(style='border: 1px solid #ddd; padding: 8px;')= master.master_id
+                                td(style='border: 1px solid #ddd; padding: 8px;')= master.name || '(Не указано)'
+                                td(style='border: 1px solid #ddd; padding: 8px;')= master.username
+                                td(style='border: 1px solid #ddd; padding: 8px;')= master.phone || '(Не указан)'
+                                td(style='border: 1px solid #ddd; padding: 8px;')= master.specialization
+                                td(style='border: 1px solid #ddd; padding: 8px;')
+                                    // Кнопка, открывающая модальное окно редактирования
+                                    button.button.small(onclick=`document.getElementById('${modalId}').style.display='block'`, style='margin-right: 5px; background: #f39c12; color: white;') Редактировать
+                                    
+                                    // Форма для удаления
+                                    form(action=`/admin/masters/delete/${master.master_id}`, method='POST', style='display:inline;')
+                                        button.button.small.danger(type='submit', onclick="return confirm('Вы уверены, что хотите удалить этого мастера? Пользователь будет переведен в клиенты.')", style='background: #e74c3c; color: white;') Удалить
+
+                            // ----------------------------------------
+                            // МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ
+                            // ----------------------------------------
+                            .modal(id=modalId, style='display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);')
+                                .modal-content(style='background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;')
+                                    span.close(onclick=`document.getElementById('${modalId}').style.display='none'`, style='color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;') &times;
+                                    h4 Редактировать данные: #{master.name || master.username}
+
+                                    form(action=`/admin/masters/edit/${master.master_id}`, method='POST')
+                                        .form-group
+                                            label Имя
+                                            input(type='text', name='name', value=master.name || '', required)
+                                        .form-group
+                                            label Телефон
+                                            input(type='text', name='phone', value=master.phone || '')
+                                        .form-group
+                                            label Специализация
+                                            input(type='text', name='specialization', value=master.specialization, required)
+                                        
+                                        button.button(type='submit') Сохранить изменения
+                    else
+                        tr
+                            td(colspan='6', style='text-align: center; border: 1px solid #ddd; padding: 8px;') Мастера пока не добавлены.

@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { requireRole } = require('../middleware/auth.middleware');
 const serviceModel = require('../models/service.model'); 
-
+const masterModel = require('../models/master.model');
 // Применяем мидлвар для всех маршрутов в этом файле
 router.use(requireRole('admin'));
 
@@ -99,6 +99,68 @@ router.post('/services/delete/:id', async (req, res) => {
     } catch (error) {
         console.error('Ошибка удаления услуги:', error);
         res.redirect('/admin/services?error=Ошибка при удалении услуги. Возможно, на нее есть записи.');
+    }
+});
+
+// -----------------------------------------
+// 3. CRUD МАСТЕРОВ (/admin/masters)
+// -----------------------------------------
+
+// R (Read) - Список мастеров
+router.get('/masters', async (req, res) => {
+    try {
+        const masters = await masterModel.getAllMastersWithUserDetails();
+        res.render('admin/masters', { 
+            title: 'Управление Мастерами', 
+            masters: masters,
+            user: req.user,
+            message: req.query.message,
+            error: req.query.error
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки мастеров:', error);
+        res.render('error', { message: 'Не удалось загрузить данные мастеров.', user: req.user });
+    }
+});
+
+// C (Create) - Добавление нового мастера
+router.post('/masters/add', async (req, res) => {
+    const { username, specialization } = req.body;
+    
+    try {
+        // ИСПРАВЛЕНО: Передаем только 2 аргумента: username и specialization
+        await masterModel.createMaster(username, specialization); 
+        
+        res.redirect('/admin/masters?message=Мастер успешно добавлен!');
+    } catch (error) {
+        console.error('Ошибка добавления мастера:', error.message);
+        res.redirect(`/admin/masters?error=Ошибка при добавлении мастера: ${error.message}`);
+    }
+});
+
+// U (Update) - Обновление мастера
+router.post('/masters/edit/:id', async (req, res) => {
+    const masterId = req.params.id;
+    const { name, phone, specialization } = req.body;
+
+    try {
+        await masterModel.updateMaster(masterId, name, phone, specialization);
+        res.redirect('/admin/masters?message=Данные мастера успешно обновлены!');
+    } catch (error) {
+        console.error('Ошибка обновления мастера:', error);
+        res.redirect('/admin/masters?error=Ошибка при обновлении мастера.');
+    }
+});
+
+// D (Delete) - Удаление мастера
+router.post('/masters/delete/:id', async (req, res) => {
+    const masterId = req.params.id;
+    try {
+        await masterModel.deleteMaster(masterId);
+        res.redirect('/admin/masters?message=Мастер успешно удален и переведен в клиенты.');
+    } catch (error) {
+        console.error('Ошибка удаления мастера:', error);
+        res.redirect('/admin/masters?error=Ошибка при удалении мастера.');
     }
 });
 
