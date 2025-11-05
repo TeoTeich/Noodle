@@ -1,0 +1,54 @@
+extends ../layout
+
+block content
+    .container
+        h2 Запись на услугу: #{serviceName}
+        
+        if !selectedMaster
+            .card(style='margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 5px;')
+                h3 1. Выберите мастера и дату
+
+                if masters.length
+                    form(action='/client/book/slots', method='POST')
+                        input(type='hidden', name='serviceId', value=serviceId) 
+
+                        .form-group
+                            label(for='masterId') Мастер
+                            select#masterId(name='masterId', required)
+                                option(value='') -- Выберите мастера --
+                                each master in masters
+                                    // Теперь master.master_id гарантированно содержит числовой ID
+                                    option(value=master.master_id)= `${master.name} (${master.specialization})`
+                        
+                        .form-group(style='margin-top: 20px;')
+                            label(for='date') Дата
+                            input#date(type='date', name='date', required, min=new Date().toISOString().split('T')[0])
+
+                        button.button(type='submit', style='background: #3498db; color: white; margin-top: 10px;') Найти свободное время
+
+                else
+                    .error-message
+                        p К сожалению, нет мастеров, выполняющих услугу "#{serviceName}". Пожалуйста, выберите другую услугу или обратитесь к администратору.
+        
+        if selectedMaster
+            .card(style='margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9;')
+                h3 2. Выберите время
+                
+                p Вы записываетесь к **#{selectedMaster.name}** (#{selectedMaster.specialization}) на **#{serviceName}** (#{serviceDuration} мин.)
+                p На дату: **#{selectedDate}**
+
+                if availableSlots && availableSlots.length
+                    p.success-message Выберите один из доступных слотов:
+
+                    .slot-list(style='display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;')
+                        each slot in availableSlots
+                            form(action='/client/book/confirm', method='POST', style='display:inline;')
+                                input(type='hidden', name='masterId', value=selectedMaster.master_id)
+                                input(type='hidden', name='serviceId', value=serviceId)
+                                input(type='hidden', name='startTime', value=slot.start_time)
+                                
+                                button.button.small(type='submit', style='background: #5cb85c; color: white;')= slot.time
+                else
+                    .error-message
+                        p На выбранную дату нет доступных слотов.
+                        a(href=`/client/book?serviceId=${serviceId}`) Выбрать другую дату/мастера
