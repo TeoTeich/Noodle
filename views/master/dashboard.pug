@@ -2,8 +2,57 @@ extends ../layout
 
 block content
     .container
-        h2 Панель Мастера
-        p Вы успешно авторизованы как #{user.role}.
+        h2 Кабинет Мастера: #{user.name || user.username}
+        p Ваши предстоящие записи.
         
-        h3 Ваше расписание
-        p Здесь будет список ваших записей с клиентами.
+        if message
+            .success-message(style='background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 20px;')= message
+        if error
+            .error-message= error
+
+        if bookings && bookings.length
+            .booking-list(style='display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;')
+                each booking in bookings
+                    .booking-card(style='border: 1px solid #ccc; padding: 15px; border-radius: 8px; background: #fff;')
+                        h3(style='color: #007bff; margin-top: 0;') #{booking.service_name}
+                        p.time 
+                            strong Время: 
+                            span #{booking.booking_date} в #{booking.booking_time} 
+                            span(style='font-size: 0.9em; color: #666;') (#{booking.duration_min} мин)
+                        
+                        p.client 
+                            strong Клиент: 
+                            span= booking.client_name
+                        p.phone 
+                            strong Телефон: 
+                            span= booking.client_phone
+
+                        p.status(style='font-weight: bold;') 
+                            | Статус: 
+                            span(style={ 'color': booking.status === 'Запланировано' ? 'orange' : (booking.status === 'Подтверждено' ? 'green' : 'black') })= booking.status
+                        
+                        hr
+                        
+                        // Формы для изменения статуса
+                        .status-actions(style='display: flex; gap: 10px; flex-wrap: wrap;')
+                            if booking.status !== 'Завершено'
+                                // Кнопка "Завершено"
+                                form(action=`/master/booking/status/${booking.booking_id}`, method='POST', style='display:inline;')
+                                    input(type='hidden', name='newStatus', value='Завершено')
+                                    button.button.small(type='submit', style='background: #28a745; color: white;') Завершить
+
+                            if booking.status !== 'Отменено'
+                                // Кнопка "Отменено"
+                                form(action=`/master/booking/status/${booking.booking_id}`, method='POST', style='display:inline;')
+                                    input(type='hidden', name='newStatus', value='Отменено')
+                                    button.button.small(type='submit', style='background: #dc3545; color: white;') Отменить
+                                    
+                            if booking.status === 'Запланировано'
+                                // Кнопка "Подтвердить"
+                                form(action=`/master/booking/status/${booking.booking_id}`, method='POST', style='display:inline;')
+                                    input(type='hidden', name='newStatus', value='Подтверждено')
+                                    button.button.small(type='submit', style='background: #007bff; color: white;') Подтвердить
+
+        else
+            p.info-message(style='padding: 15px; border: 1px solid #ddd; background: #f0f0f0; border-radius: 4px;')
+                | У вас пока нет запланированных записей.

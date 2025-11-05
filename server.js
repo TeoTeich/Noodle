@@ -5,6 +5,7 @@ const path = require('path');
 const db = require('./config/db'); 
 const { isAuthenticated } = require('./middleware/auth.middleware');
 
+
 require('dotenv').config(); 
 const app = express();
 const PORT = process.env.PORT || 3000;

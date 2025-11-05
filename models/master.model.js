@@ -109,9 +109,16 @@ async function deleteMaster(masterId) {
     await db.execute('UPDATE users SET role_id = ? WHERE id = ?', [clientRoleId, userId]);
 }
 
+// Новая функция: Получение master_id по user_id
+async function getMasterDetailsByUserId(userId) {
+    const [rows] = await db.execute('SELECT id, specialization FROM masters WHERE user_id = ?', [userId]);
+    return rows.length > 0 ? rows[0] : null;
+}
+
 module.exports = {
     getAllMastersWithUserDetails,
     createMaster,
     updateMaster,
     deleteMaster,
+    getMasterDetailsByUserId
 };
