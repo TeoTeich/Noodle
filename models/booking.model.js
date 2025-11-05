@@ -159,10 +159,49 @@ async function getClientBookings(clientId) {
     return rows;
 }
 
+/**
+ * Отменяет запись, устанавливая статус 'Отменено'.
+ */
+async function cancelBooking(bookingId, clientId) {
+    // Убеждаемся, что только владелец записи может ее отменить
+    const query = `
+        UPDATE bookings 
+        SET status = 'Отменено' 
+        WHERE id = ? AND client_user_id = ? 
+        AND status IN ('Запланировано', 'Подтверждено')
+    `;
+    const [result] = await db.execute(query, [bookingId, clientId]);
+    
+    if (result.affectedRows === 0) {
+        throw new Error("Запись не найдена, уже отменена, завершена, или у вас нет прав на ее отмену.");
+    }
+    return true;
+}
+
+/**
+ * Переносит запись на новую дату и время.
+ */
+async function rescheduleBooking(bookingId, clientId, newDate, newTime) {
+    // Убеждаемся, что только владелец записи может ее изменить
+    const query = `
+        UPDATE bookings 
+        SET booking_date = ?, booking_time = ?, status = 'Запланировано' 
+        WHERE id = ? AND client_user_id = ? 
+        AND status IN ('Запланировано', 'Подтверждено')
+    `;
+    const [result] = await db.execute(query, [newDate, newTime, bookingId, clientId]);
+    
+    if (result.affectedRows === 0) {
+        throw new Error("Запись не найдена, уже отменена, завершена, или у вас нет прав на ее перенос.");
+    }
+    return true;
+}
 
 module.exports = {
     getAvailableSlots,
     createBooking, 
     getMasterServiceDetails,
-    getClientBookings
+    getClientBookings,
+    cancelBooking,
+    rescheduleBooking
 };

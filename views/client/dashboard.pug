@@ -34,9 +34,25 @@ block content
                                 span(style={ 'font-weight': 'bold', 'color': booking.status === 'Запланировано' ? 'orange' : (booking.status === 'Подтверждено' ? 'green' : (booking.status === 'Завершено' ? '#6c757d' : 'red')) })= booking.status
 
                         if booking.status === 'Запланировано' || booking.status === 'Подтверждено'
-                            // Кнопка отмены (пока без POST-обработчика, но готова к подключению)
-                            // Если хотите реализовать отмену, сообщите, и мы добавим POST-роут.
-                            button.button.small(disabled, style='background: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 4px; font-size: 0.85em; cursor: default; opacity: 0.6; margin-top: 10px;') Отменить (не реализовано)
+                            hr
+
+                            // --- ФОРМА ПЕРЕНОСА ---
+                            .reschedule-form(style='margin-bottom: 15px; border: 1px dashed #ccc; padding: 10px; border-radius: 4px;')
+                                form(action=`/client/booking/reschedule/${booking.booking_id}`, method='POST', style='display: flex; gap: 10px; align-items: flex-end;')
+                                    .form-group
+                                        label(for=`newDate-${booking.booking_id}`) Новая дата
+                                        input.input.small(type='date', name='newDate', required, id=`newDate-${booking.booking_id}`, min=new Date().toISOString().split('T')[0])
+                                    
+                                    .form-group
+                                        label(for=`newTime-${booking.booking_id}`) Новое время
+                                        // Время в формате HH:MM
+                                        input.input.small(type='time', name='newTime', required, id=`newTime-${booking.booking_id}`, value=booking.booking_time)
+
+                                    button.button.small(type='submit', style='background: #ffc107; color: black; font-weight: bold; padding: 5px 10px;') Перенести
+
+                            // --- КНОПКА ОТМЕНЫ ---
+                            form(action=`/client/booking/cancel/${booking.booking_id}`, method='POST', style='display:inline;')
+                                button.button.small(type='submit', style='background: #dc3545; color: white; padding: 8px 15px;') Отменить запись
         else
             .info-message(style='padding: 15px; border: 1px solid #ddd; background: #f0f0f0; border-radius: 4px;')
                 p У вас пока нет записей.
