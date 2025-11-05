@@ -3,11 +3,46 @@ extends ../layout
 block content
     .container
         h2 Личный кабинет Клиента
-        p Вы успешно авторизованы как #{user.role}.
+        p Вы успешно авторизованы как #{user.username}.
+
         if message
-            .success-message= message
-        
-        h3 Ваши предстоящие записи
-        p Здесь будет список ваших записей.
-        
-        a.button(href='/client/book') Записаться на новую услугу
+            .success-message(style='background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 20px;')= message
+        if error
+            .error-message(style='background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 20px;')= error
+
+        // ------------------------------------
+        // Раздел: Ваши записи
+        // ------------------------------------
+        h3(style='margin-top: 30px; border-bottom: 2px solid #eee; padding-bottom: 5px;') Ваши записи
+
+        if bookings && bookings.length
+            .booking-list(style='display: flex; flex-direction: column; gap: 15px;')
+                each booking in bookings
+                    .booking-card(style='border: 1px solid #ddd; padding: 15px; border-radius: 6px; background: #fff;')
+                        h4(style='margin-top: 0; color: #007bff;') #{booking.service_name}
+                        
+                        .details(style='font-size: 0.95em;')
+                            p(style='margin: 5px 0;') 
+                                strong Дата и время: 
+                                span #{booking.booking_date} в #{booking.booking_time} 
+                                span(style='color: #6c757d;') (#{booking.duration_min} мин)
+                            p(style='margin: 5px 0;') 
+                                strong Мастер: 
+                                span #{booking.master_name} (#{booking.specialization})
+                            p(style='margin: 5px 0;') 
+                                strong Статус: 
+                                span(style={ 'font-weight': 'bold', 'color': booking.status === 'Запланировано' ? 'orange' : (booking.status === 'Подтверждено' ? 'green' : (booking.status === 'Завершено' ? '#6c757d' : 'red')) })= booking.status
+
+                        if booking.status === 'Запланировано' || booking.status === 'Подтверждено'
+                            // Кнопка отмены (пока без POST-обработчика, но готова к подключению)
+                            // Если хотите реализовать отмену, сообщите, и мы добавим POST-роут.
+                            button.button.small(disabled, style='background: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 4px; font-size: 0.85em; cursor: default; opacity: 0.6; margin-top: 10px;') Отменить (не реализовано)
+        else
+            .info-message(style='padding: 15px; border: 1px solid #ddd; background: #f0f0f0; border-radius: 4px;')
+                p У вас пока нет записей.
+
+        // ------------------------------------
+        // Раздел: Новая запись
+        // ------------------------------------
+        h3(style='margin-top: 40px;') Новая запись
+        a.button(href='/', style='background: #5cb85c; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none; display: inline-block;') Записаться на новую услугу

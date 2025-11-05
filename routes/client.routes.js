@@ -10,13 +10,28 @@ router.use(requireRole('client'));
 // -----------------------------------------
 // 1. КАБИНЕТ КЛИЕНТА
 // -----------------------------------------
-router.get('/dashboard', (req, res) => {
-    res.render('client/dashboard', { 
-        title: 'Личный кабинет', 
-        user: req.user,
-        message: req.query.message,
-        error: req.query.error
-    });
+router.get('/dashboard', async (req, res) => {
+    try {
+        // Получаем все записи для текущего пользователя (req.user.id)
+        const bookings = await bookingModel.getClientBookings(req.user.id);
+
+        res.render('client/dashboard', { 
+            title: 'Личный кабинет', 
+            user: req.user,
+            bookings: bookings, // Передаем записи в шаблон
+            message: req.query.message,
+            error: req.query.error
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки дашборда клиента:', error);
+        res.render('client/dashboard', { // Fallback, чтобы не обрушить страницу
+            title: 'Личный кабинет', 
+            user: req.user,
+            bookings: [],
+            message: req.query.message,
+            error: 'Ошибка при загрузке ваших записей.'
+        });
+    }
 });
 
 // -----------------------------------------

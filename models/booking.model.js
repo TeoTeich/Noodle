@@ -134,9 +134,35 @@ async function createBooking(clientId, masterId, serviceId, start_time) {
     return result.insertId;
 }
 
+/**
+ * Получает все записи (прошедшие и предстоящие) для данного клиента.
+ */
+async function getClientBookings(clientId) {
+    const query = `
+        SELECT 
+            b.id AS booking_id,
+            b.booking_date,
+            b.booking_time,
+            b.status,
+            s.name AS service_name,
+            s.duration_min,
+            m.specialization,
+            u.name AS master_name
+        FROM bookings b
+        JOIN services s ON b.service_id = s.id
+        JOIN masters m ON b.master_id = m.id
+        JOIN users u ON m.user_id = u.id
+        WHERE b.client_user_id = ?
+        ORDER BY b.booking_date DESC, b.booking_time DESC;
+    `;
+    const [rows] = await db.execute(query, [clientId]);
+    return rows;
+}
+
 
 module.exports = {
     getAvailableSlots,
     createBooking, 
-    getMasterServiceDetails
+    getMasterServiceDetails,
+    getClientBookings
 };
