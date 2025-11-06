@@ -3,11 +3,17 @@ extends ../layout
 block content
     .container
         h2 Административная панель
-        p Вы успешно авторизованы как #{user.role}.
         
-        .admin-menu
+        if message
+            .success-message= message
+        if error
+            .error-message= error
+
+        p Вы успешно авторизованы как #{user.role}.
+
+        .card
             h3 Меню
-            ul
-                li: a(href='/admin/services') Управление Услугами
-                li: a(href='/admin/masters') Управление Мастерами
-                // Можно добавить ссылки на управление пользователями и мастерами
+            ul(style='list-style: none; padding: 0; display: flex; gap: 20px;')
+                li: a.button.primary(href='/admin/services') Управление Услугами
+                li: a.button.primary(href='/admin/masters') Управление Мастерами
+                // Можно добавить ссылки на управление пользователями

@@ -5,14 +5,14 @@ block content
         h2 Управление Мастерами
         
         if message
-            .success-message(style='padding: 10px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; margin-bottom: 20px;')= message
+            .success-message= message
         if error
-            .error-message(style='padding: 10px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; margin-bottom: 20px;')= error
-
+            .error-message= error
+            
         // ----------------------------------------
         // 1. ФОРМА ДОБАВЛЕНИЯ МАСТЕРА
         // ----------------------------------------
-        .card(style='margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 5px;')
+        .card
             h3 Добавить нового мастера (повысить роль)
             p.note Введите логин **уже существующего** пользователя, чтобы назначить его мастером.
             form(action='/admin/masters/add', method='POST')
@@ -22,61 +22,67 @@ block content
                 .form-group
                     label(for='specialization') Специализация
                     input#specialization(type='text', name='specialization', required)
-                
-                button.button(type='submit', style='background: #3498db; color: white;') Назначить Мастером
+
+                button.button.primary(type='submit') Назначить Мастером
 
         // ----------------------------------------
-        // 2. СПИСОК МАСТЕРОВ
+        // 2. ФИЛЬТРАЦИЯ МАСТЕРОВ (Форма поиска)
+        // ----------------------------------------
+        .filter-sort-controls
+            h4 Поиск мастера
+            form.filter-form(action='/admin/masters', method='GET')
+                .form-group
+                    // Предполагается, что 'searchQuery' передается в случае фильтрации
+                    label(for='search') Поиск по логину/специализации
+                    input#search(type='text', name='search', value=searchQuery || '') 
+                .form-group(style='padding-bottom: 5px;')
+                    button.button.primary(type='submit') Поиск
+
+        // ----------------------------------------
+        // 3. СПИСОК МАСТЕРОВ
         // ----------------------------------------
         .card
             h3 Список всех мастеров
-            table.data-table(style='width: 100%; border-collapse: collapse; margin-top: 20px;')
+            table.data-table
                 thead
                     tr
-                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') ID Мастера
-                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Имя
-                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Логин
-                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Телефон
-                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Специализация
-                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Действия
+                        th ID Мастера
+                        th Имя
+                        th Логин
+                        th Телефон
+                        th Специализация
+                        th Действия
                 tbody
                     if masters && masters.length
                         each master in masters
                             - const modalId = 'editMasterModal' + master.master_id
                             tr
-                                td(style='border: 1px solid #ddd; padding: 8px;')= master.master_id
-                                td(style='border: 1px solid #ddd; padding: 8px;')= master.name || '(Не указано)'
-                                td(style='border: 1px solid #ddd; padding: 8px;')= master.username
-                                td(style='border: 1px solid #ddd; padding: 8px;')= master.phone || '(Не указан)'
-                                td(style='border: 1px solid #ddd; padding: 8px;')= master.specialization
-                                td(style='border: 1px solid #ddd; padding: 8px;')
+                                td= master.master_id
+                                td= master.name || '(Не указано)'
+                                td= master.username
+                                td= master.phone || '(Не указан)'
+                                td= master.specialization
+                                td
                                     // Кнопка, открывающая модальное окно редактирования
-                                    button.button.small(onclick=`document.getElementById('${modalId}').style.display='block'`, style='margin-right: 5px; background: #f39c12; color: white;') Редактировать
-                                    
+                                    button.button.small.warning(onclick=`document.getElementById('${modalId}').style.display='block'`) Редактировать
+
                                     // Форма для удаления
                                     form(action=`/admin/masters/delete/${master.master_id}`, method='POST', style='display:inline;')
-                                        button.button.small.danger(type='submit', onclick="return confirm('Вы уверены, что хотите удалить этого мастера? Пользователь будет переведен в клиенты.')", style='background: #e74c3c; color: white;') Удалить
-
-                            // ----------------------------------------
-                            // МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ
-                            // ----------------------------------------
-                            .modal(id=modalId, style='display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);')
-                                .modal-content(style='background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;')
-                                    span.close(onclick=`document.getElementById('${modalId}').style.display='none'`, style='color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;') &times;
-                                    h4 Редактировать данные: #{master.name || master.username}
-
+                                        button.button.small.danger(type='submit', onclick="return confirm('Вы уверены, что хотите удалить этого мастера? Пользователь будет переведен в клиенты.')") Удалить
+                            
+                            // МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ МАСТЕРА
+                            .modal(id=modalId)
+                                .modal-content
+                                    span.close(onclick=`document.getElementById('${modalId}').style.display='none'`) &times;
+                                    h4 Редактировать мастера: #{master.username}
                                     form(action=`/admin/masters/edit/${master.master_id}`, method='POST')
+                                        p(style='font-weight: bold;') Имя: #{master.name}
+                                        p(style='font-weight: bold;') Логин: #{master.username}
                                         .form-group
-                                            label Имя
-                                            input(type='text', name='name', value=master.name || '', required)
-                                        .form-group
-                                            label Телефон
-                                            input(type='text', name='phone', value=master.phone || '')
-                                        .form-group
-                                            label Специализация
-                                            input(type='text', name='specialization', value=master.specialization, required)
+                                            label(for='edit_specialization') Специализация
+                                            input#edit_specialization(type='text', name='specialization', value=master.specialization, required)
                                         
-                                        button.button(type='submit') Сохранить изменения
+                                        button.button.primary(type='submit') Сохранить
                     else
                         tr
-                            td(colspan='6', style='text-align: center; border: 1px solid #ddd; padding: 8px;') Мастера пока не добавлены.
+                            td(colspan='6') Мастера не найдены.

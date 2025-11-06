@@ -10,8 +10,8 @@ block content
             .error-message= error
 
         // --- ФОРМА ФИЛЬТРАЦИИ И СОРТИРОВКИ ---
-        .filter-sort-controls(style='margin-bottom: 25px; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 4px;')
-            h3(style='margin-top: 0; margin-bottom: 15px; font-size: 1.2em;') 🔎 Фильтр и Сортировка
+        .filter-sort-controls 
+            h3 🔎 Фильтр и Сортировка 
             
             form(action='/master/dashboard', method='GET', class='filter-form')
                 // Поле: Фильтр по дате
@@ -32,15 +32,16 @@ block content
                         option(value='date_desc', selected=currentSort === 'date_desc') Самая дальняя дата
                         option(value='client_asc', selected=currentSort === 'client_asc') Клиент (А-Я)
 
-                .form-group(style='padding-top: 25px;')
+                // Кнопки (применяем новый класс для отступа)
+                .form-group.filter-button-group
                     button.button(type='submit') Применить
 
                 // Кнопка сброса (перезагружает страницу без параметров)
-                .form-group(style='padding-top: 25px;')
+                .form-group.filter-button-group
                     a.button.warning(href='/master/dashboard') Сброс
             
-        p Ваши предстоящие записи (только "Запланировано" и "Подтверждено").
         
+        p Ваши предстоящие записи (только "Запланировано" и "Подтверждено").
         if bookings && bookings.length
             .booking-list.column-list
                 each booking in bookings
@@ -51,6 +52,7 @@ block content
                             span(style='margin-left: 10px;').duration-text (#{booking.duration_min} мин.)
                         p Услуга: #{booking.service_name}
                         p Клиент: **#{booking.client_name}** (#{booking.client_phone})
+                        
                         p Статус: 
                             span(class=`status-${booking.status.toLowerCase().replace(/[^a-zа-яё]/g, '')}`) #{booking.status}
                         

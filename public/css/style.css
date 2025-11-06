@@ -1,0 +1,287 @@
+/* --- ЦВЕТОВАЯ ПАЛИТРА NOODLE --- */
+:root {
+    --color-primary: #E0A9A9; /* Мягкий персик / Акцент */
+    --color-secondary: #B5C7B7; /* Мягкий шалфей / Основные кнопки */
+    --color-background: #FDF5E6; /* Кремовый/Сливочный фон */
+    --color-surface: #FFFFFF; /* Белый для карточек */
+    --color-text-dark: #3C3C3C; /* Темный текст */
+    --color-text-light: #FDF5E6; /* Светлый текст */
+    --color-danger: #C04C4C; /* Красный */
+    --color-warning: #DDAA33; /* Желтый/Горчичный */
+    --color-success: #6CAE6C; /* Зеленый */
+    --border-radius: 6px;
+    --spacing-m: 15px;
+    --spacing-l: 25px;
+}
+
+/* --- ОБЩИЕ СТИЛИ --- */
+* {
+    box-sizing: border-box; /* Учитывает padding и border в ширине элемента */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding-top: 60px; /* Отступ для фиксированного навбара */
+    background: var(--color-background);
+    color: var(--color-text-dark);
+}
+
+.container {
+    width: 90%;
+    max-width: 960px; /* Увеличенная ширина для контента */
+    margin: 0 auto;
+    padding: var(--spacing-l) var(--spacing-m);
+}
+
+h1, h2, h3 {
+    color: var(--color-primary);
+    margin-top: 0;
+}
+
+/* --- НАВИГАЦИОННАЯ ПАНЕЛЬ (Учитывает скроллбар) --- */
+.navbar {
+    background: var(--color-primary);
+    color: var(--color-text-light);
+    padding: 10px var(--spacing-m);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    color: var(--color-text-light);
+    text-decoration: none;
+    font-size: 1.6em;
+    font-weight: 600;
+}
+
+.nav-links a, .nav-links button {
+    color: var(--color-text-light);
+    text-decoration: none;
+    margin-left: var(--spacing-m);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    padding: 8px 10px;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s;
+}
+
+.nav-links a:hover, .nav-links button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- ФОРМЫ И ЭЛЕМЕНТЫ УПРАВЛЕНИЯ (Центрирование) --- */
+.card {
+    background: var(--color-surface);
+    padding: var(--spacing-l);
+    margin-bottom: var(--spacing-l);
+    border: 1px solid #eee;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Легкая тень для разделения */
+}
+
+.auth-form {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 40px;
+    background: var(--color-surface);
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-m);
+    display: flex;
+    flex-direction: column; /* Элементы формы центрируются по горизонтали в .card */
+}
+
+label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 1em;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+    border-color: var(--color-primary);
+    outline: none;
+}
+
+/* --- КНОПКИ --- */
+.button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1em;
+    text-align: center;
+    display: inline-block;
+    transition: background-color 0.2s, opacity 0.2s;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+
+.button.primary {
+    background: var(--color-secondary); /* Мягкий шалфей */
+    color: var(--color-text-dark);
+}
+
+.button.warning {
+    background: var(--color-warning);
+    color: var(--color-text-dark);
+}
+
+.button.danger {
+    background: var(--color-danger);
+    color: var(--color-text-light);
+}
+
+.button.success {
+    background: var(--color-success);
+    color: var(--color-text-light);
+}
+
+.button.small {
+    padding: 6px 10px;
+    font-size: 0.9em;
+}
+
+/* --- ВИЗУАЛЬНОЕ ОТДЕЛЕНИЕ УСЛУГ И ЗАПИСЕЙ --- */
+.service-list, .booking-list, .column-list {
+    display: grid;
+    gap: var(--spacing-m);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    margin-top: var(--spacing-l);
+}
+
+.service-card, .booking-card {
+    background: var(--color-surface);
+    padding: var(--spacing-m);
+    border: 1px solid #f0f0f0;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Отделение */
+    transition: transform 0.2s;
+}
+
+.booking-card:hover, .service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Список слотов для записи */
+.slot-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: var(--spacing-m);
+}
+
+/* Таблицы данных (Админ-панель) */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--spacing-l);
+    background: var(--color-surface);
+}
+
+.data-table th, .data-table td {
+    border: 1px solid #f0f0f0;
+    padding: 12px;
+    text-align: left;
+}
+
+.data-table thead {
+    background-color: #f7f7f7;
+    color: var(--color-text-dark);
+}
+
+/* Сообщения */
+.success-message {
+    padding: 10px;
+    background: #e6ffe6; /* Очень светлый зеленый */
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-m);
+}
+
+.error-message {
+    padding: 10px;
+    background: #fff0f0; /* Очень светлый красный */
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-m);
+}
+
+/* Модальные окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: var(--color-surface);
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 500px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* --- Стили для Dashboard (Фильтры) --- */
+.filter-sort-controls {
+    background: var(--color-surface);
+    border: 1px solid #eee;
+    border-radius: var(--border-radius);
+    padding: var(--spacing-m);
+    margin-bottom: var(--spacing-l);
+}
+
+.filter-form {
+    display: flex;
+    gap: var(--spacing-m);
+    align-items: flex-end;
+    flex-wrap: wrap; /* Для адаптивности */
+}

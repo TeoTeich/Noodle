@@ -1,23 +1,30 @@
 extends layout
 
 block content
-    .hero(style='text-align: center; padding: 50px 0; background: #e0f7fa;')
-        h1 Добро пожаловать в Noodle!
-        p Салон красоты, где ваша красота — наша забота.
-    
     .container
-        .services-section
-            h2 Наши Услуги
-            if services && services.length
-                .service-list
-                    each service in services
-                        .service-card(style='margin-bottom: 20px; padding: 15px; border: 1px solid #eee;')
-                            h3= service.name
-                            p.price Цена: #{service.price} руб.
-                            p.duration Длительность: #{service.duration_min} мин.
-                            if user
-                                a.button(href=`/client/book?serviceId=${service.id}`) Записаться
-                            else
-                                a.button(href=`/login?returnTo=/client/book?serviceId=${service.id}`) Войти, чтобы записаться
-            else
-                p Услуги пока не добавлены.
+        h1 Добро пожаловать в Noodle
+        p Выберите услугу и запишитесь к мастеру!
+
+        if message
+            .success-message= message
+        if error
+            .error-message= error
+
+        h2 Наши услуги
+
+        if services && services.length
+            .service-list
+                each service in services
+                    .service-card
+                        h3(style='color: var(--color-secondary);') #{service.name}
+                        p.
+                            #{service.description}
+                        
+                        p(style='font-weight: bold;') Цена: #{service.price} руб.
+                        p.
+                            Длительность: #{service.duration_min} мин.
+                        
+                        // Кнопка, ведущая на форму записи
+                        a.button.primary(href=`/client/book?serviceId=${service.id}`)  Записаться
+        else
+            p В настоящее время нет доступных услуг.

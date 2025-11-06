@@ -8,22 +8,19 @@ block content
             
         form(action='/register', method='POST')
             .form-group
-                label(for='name') Ваше Имя
+                label(for='name') Имя
                 input#name(type='text', name='name', required)
-            
+            .form-group
+                label(for='username') Логин (Username)
+                input#username(type='text', name='username', required)
             .form-group
                 label(for='phone') Телефон
-                input#phone(type='tel', name='phone', placeholder='9991234567', required)
-            
-            .form-group
-                label(for='username') Имя пользователя (Логин)
-                input#username(type='text', name='username', required)
-            
+                input#phone(type='text', name='phone', required)
             .form-group
                 label(for='password') Пароль
                 input#password(type='password', name='password', required)
             
-            button(type='submit') Зарегистрироваться
+            button.button.primary(type='submit') Зарегистрироваться
         
         p Уже есть аккаунт? 
             a(href='/login') Войти
