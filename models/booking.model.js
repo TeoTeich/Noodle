@@ -135,9 +135,41 @@ async function createBooking(clientId, masterId, serviceId, start_time) {
 }
 
 /**
- * Получает все записи (прошедшие и предстоящие) для данного клиента.
+ * Получает все записи для данного клиента с опциональной сортировкой и фильтрацией по статусу.
+ * @param {number} clientId ID клиента.
+ * @param {string} sortBy Поле для сортировки ('date_asc', 'date_desc', 'status_asc').
+ * @param {string} filterStatus Статус для фильтрации (например, 'Запланировано', 'Отменено' или 'all').
  */
-async function getClientBookings(clientId) {
+async function getClientBookings(clientId, sortBy = 'date_asc', filterStatus = 'all') {
+    let orderByClause = '';
+    let statusFilterClause = '';
+    const queryParams = [clientId];
+
+    switch (sortBy) {
+        // ... (логика сортировки без изменений) ...
+        case 'date_desc':
+            orderByClause = 'ORDER BY b.booking_date DESC, b.booking_time DESC';
+            break;
+        case 'status_asc':
+            orderByClause = `
+                ORDER BY 
+                    FIELD(b.status, 'Запланировано', 'Подтверждено', 'Завершено', 'Отменено'),
+                    b.booking_date ASC, 
+                    b.booking_time ASC
+            `;
+            break;
+        case 'date_asc':
+        default:
+            orderByClause = 'ORDER BY b.booking_date ASC, b.booking_time ASC';
+            break;
+    }
+    
+    // ЛОГИКА ФИЛЬТРАЦИИ ПО СТАТУСУ
+    if (filterStatus !== 'all') {
+        statusFilterClause = 'AND b.status = ?';
+        queryParams.push(filterStatus);
+    }
+
     const query = `
         SELECT 
             b.id AS booking_id,
@@ -153,9 +185,10 @@ async function getClientBookings(clientId) {
         JOIN masters m ON b.master_id = m.id
         JOIN users u ON m.user_id = u.id
         WHERE b.client_user_id = ?
-        ORDER BY b.booking_date ASC, b.booking_time ASC; 
+        ${statusFilterClause}
+        ${orderByClause};
     `;
-    const [rows] = await db.execute(query, [clientId]);
+    const [rows] = await db.execute(query, queryParams);
     return rows;
 }
 

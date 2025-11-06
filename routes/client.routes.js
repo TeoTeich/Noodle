@@ -12,28 +12,29 @@ router.use(requireRole('client'));
 // -----------------------------------------
 router.get('/dashboard', async (req, res) => {
     try {
-        // Получаем все записи для текущего пользователя (req.user.id)
-        const bookings = await bookingModel.getClientBookings(req.user.id);
+        const clientId = req.user.id;
+        
+        // 1. Получаем параметры
+        const sortBy = req.query.sort || 'date_asc'; 
+        const filterStatus = req.query.status || 'all'; // <-- НОВЫЙ ПАРАМЕТР: По умолчанию 'all'
+        
+        // 2. Используем новую функцию
+        const bookings = await bookingModel.getClientBookings(clientId, sortBy, filterStatus);
 
         res.render('client/dashboard', { 
-            title: 'Личный кабинет', 
+            title: 'Личный Кабинет', 
             user: req.user,
-            bookings: bookings, // Передаем записи в шаблон
+            bookings: bookings,
+            currentSort: sortBy,
+            currentStatus: filterStatus, // <-- НОВЫЙ ПАРАМЕТР
             message: req.query.message,
             error: req.query.error
         });
     } catch (error) {
-        console.error('Ошибка загрузки дашборда клиента:', error);
-        res.render('client/dashboard', { // Fallback, чтобы не обрушить страницу
-            title: 'Личный кабинет', 
-            user: req.user,
-            bookings: [],
-            message: req.query.message,
-            error: 'Ошибка при загрузке ваших записей.'
-        });
+        console.error('Ошибка при загрузке дашборда клиента:', error);
+        res.render('error', { message: 'Не удалось загрузить записи клиента.', user: req.user });
     }
 });
-
 // -----------------------------------------
 // 2. ФОРМА ЗАПИСИ (Шаг 1: Выбор мастера)
 // -----------------------------------------

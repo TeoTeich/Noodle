@@ -15,6 +15,46 @@ block content
         // ------------------------------------
         h3(style='margin-top: 30px; border-bottom: 2px solid #eee; padding-bottom: 5px;') Ваши записи
 
+        // --- БЛОК ФИЛЬТРАЦИИ И СОРТИРОВКИ ---
+        .filter-sort-controls(style='margin-bottom: 25px; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 4px;')
+            h3(style='margin-top: 0; margin-bottom: 15px; font-size: 1.2em;') 🔎 Фильтр и Сортировка
+            
+            // Форма отправляет GET-запрос обратно на /client/dashboard
+            form(action='/client/dashboard', method='GET', style='display: flex; gap: 15px; align-items: flex-end;')
+                
+                // 1. Фильтр по дате (YYYY-MM-DD)
+                .form-group(style='flex-grow: 1;')
+                    label(for='filter_date') Дата
+                    // Переменная filterDate должна быть передана из роута
+                    input#filter_date(type='date', name='date', value=filterDate || '', style='max-width: 100%;')
+
+                // 2. Фильтр по статусу
+                .form-group(style='width: 150px;')
+                    label(for='filter_status') Статус
+                    // Переменная filterStatus должна быть передана из роута
+                    select#filter_status(name='status', style='max-width: 100%;')
+                        option(value='', selected=filterStatus === '') Все
+                        option(value='Запланировано', selected=filterStatus === 'Запланировано') Запланировано
+                        option(value='Подтверждено', selected=filterStatus === 'Подтверждено') Подтверждено
+                        option(value='Завершено', selected=filterStatus === 'Завершено') Завершено
+                        option(value='Отменено', selected=filterStatus === 'Отменено') Отменено
+                
+                // 3. Сортировка
+                .form-group(style='width: 180px;')
+                    label(for='sort') Сортировка
+                    // Переменная currentSort должна быть передана из роута
+                    select#sort(name='sort', style='max-width: 100%;')
+                        option(value='date_asc', selected=currentSort === 'date_asc') Ближайшая дата
+                        option(value='date_desc', selected=currentSort === 'date_desc') Самая дальняя дата
+                        option(value='status_asc', selected=currentSort === 'status_asc') Статус
+                
+                // 4. Кнопки
+                .form-group(style='display: flex; gap: 10px; margin-bottom: 0;')
+                    button.button(type='submit', style='background: #3498db; color: white;') Применить
+                    // Сброс всех параметров фильтрации и сортировки
+                    a.button.warning(href='/client/dashboard') Сброс
+
+        // --- БЛОК ОТОБРАЖЕНИЯ ЗАПИСЕЙ ---
         if bookings && bookings.length
             .booking-list(style='display: flex; flex-direction: column; gap: 15px;')
                 each booking in bookings
@@ -24,35 +64,39 @@ block content
                         .details(style='font-size: 0.95em;')
                             p(style='margin: 5px 0;') 
                                 strong Дата и время: 
-                                span #{booking.booking_date} в #{booking.booking_time} 
-                                span(style='color: #6c757d;') (#{booking.duration_min} мин)
+                                | #{booking.booking_date} в #{booking.booking_time} 
+                                span(style='font-size: 0.9em; color: #666;') (#{booking.duration_min} мин)
                             p(style='margin: 5px 0;') 
                                 strong Мастер: 
-                                span #{booking.master_name} (#{booking.specialization})
+                                | #{booking.master_name}
                             p(style='margin: 5px 0;') 
                                 strong Статус: 
-                                span(style={ 'font-weight': 'bold', 'color': booking.status === 'Запланировано' ? 'orange' : (booking.status === 'Подтверждено' ? 'green' : (booking.status === 'Завершено' ? '#6c757d' : 'red')) })= booking.status
-
-                        if booking.status === 'Запланировано' || booking.status === 'Подтверждено'
-                            hr
-
-                            // --- ФОРМА ПЕРЕНОСА ---
-                            .reschedule-form(style='margin-bottom: 15px; border: 1px dashed #ccc; padding: 10px; border-radius: 4px;')
-                                form(action=`/client/booking/reschedule/${booking.booking_id}`, method='POST', style='display: flex; gap: 10px; align-items: flex-end;')
-                                    .form-group
+                                span(style='font-weight: bold; margin-left: 5px; color: #2ecc71;')= booking.status
+                        
+                        // --- ДЕЙСТВИЯ: Отмена и Перенос ---
+                        - const isEditable = booking.status === 'Запланировано' || booking.status === 'Подтверждено'
+                        
+                        if isEditable
+                            .booking-actions(style='margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee;')
+                                
+                                // --- ФОРМА ПЕРЕНОСА ---
+                                form(action=`/client/booking/reschedule/${booking.booking_id}`, method='POST', style='display: block; margin-bottom: 10px; border: 1px solid #ffc107; padding: 10px; border-radius: 4px;')
+                                    p(style='margin-top: 0; font-weight: bold; color: #ffc107;') Перенос записи:
+                                    
+                                    .form-group(style='display: inline-block; width: 150px; margin-right: 10px;')
                                         label(for=`newDate-${booking.booking_id}`) Новая дата
                                         input.input.small(type='date', name='newDate', required, id=`newDate-${booking.booking_id}`, min=new Date().toISOString().split('T')[0])
                                     
-                                    .form-group
+                                    .form-group(style='display: inline-block; width: 120px; margin-right: 10px;')
                                         label(for=`newTime-${booking.booking_id}`) Новое время
-                                        // Время в формате HH:MM
                                         input.input.small(type='time', name='newTime', required, id=`newTime-${booking.booking_id}`, value=booking.booking_time)
 
-                                    button.button.small(type='submit', style='background: #ffc107; color: black; font-weight: bold; padding: 5px 10px;') Перенести
+                                    .form-group(style='display: inline-block; vertical-align: top; padding-top: 25px;')
+                                        button.button.small(type='submit', style='background: #ffc107; color: black; font-weight: bold;') Перенести
 
-                            // --- КНОПКА ОТМЕНЫ ---
-                            form(action=`/client/booking/cancel/${booking.booking_id}`, method='POST', style='display:inline;')
-                                button.button.small(type='submit', style='background: #dc3545; color: white; padding: 8px 15px;') Отменить запись
+                                // --- КНОПКА ОТМЕНЫ ---
+                                form(action=`/client/booking/cancel/${booking.booking_id}`, method='POST', style='display:inline;')
+                                    button.button.small(type='submit', style='background: #dc3545; color: white; padding: 8px 15px;', onclick="return confirm('Вы уверены, что хотите отменить эту запись? Ее нельзя будет восстановить.')") Отменить запись
         else
             .info-message(style='padding: 15px; border: 1px solid #ddd; background: #f0f0f0; border-radius: 4px;')
                 p У вас пока нет записей.
@@ -61,4 +105,4 @@ block content
         // Раздел: Новая запись
         // ------------------------------------
         h3(style='margin-top: 40px;') Новая запись
-        a.button(href='/', style='background: #5cb85c; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none; display: inline-block;') Записаться на новую услугу
+        a.button(href='/', style='background: #5cb85c; color: white; padding: 10px 15px; border-radius: 4px;') Выбрать услугу и записаться
