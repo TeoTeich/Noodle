@@ -3,56 +3,70 @@ extends ../layout
 block content
     .container
         h2 Кабинет Мастера: #{user.name || user.username}
-        p Ваши предстоящие записи.
         
         if message
-            .success-message(style='background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 20px;')= message
+            .success-message= message
         if error
             .error-message= error
 
+        // --- ФОРМА ФИЛЬТРАЦИИ И СОРТИРОВКИ ---
+        .filter-sort-controls(style='margin-bottom: 25px; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 4px;')
+            h3(style='margin-top: 0; margin-bottom: 15px; font-size: 1.2em;') 🔎 Фильтр и Сортировка
+            
+            form(action='/master/dashboard', method='GET', class='filter-form')
+                // Поле: Фильтр по дате
+                .form-group(style='flex-grow: 1;')
+                    label(for='filter_date') Дата
+                    input#filter_date(type='date', name='date', value=filterDate || '', style='max-width: 100%;')
+
+                // Поле: Фильтр по клиенту
+                .form-group(style='flex-grow: 1;')
+                    label(for='filter_client') Имя клиента (поиск)
+                    input#filter_client(type='text', name='clientName', value=filterClientName || '', style='max-width: 100%;')
+                
+                // Выпадающий список для сортировки
+                .form-group(style='width: 180px;')
+                    label(for='sort') Сортировка
+                    select#sort(name='sort', style='max-width: 100%;')
+                        option(value='date_asc', selected=currentSort === 'date_asc') Ближайшая дата
+                        option(value='date_desc', selected=currentSort === 'date_desc') Самая дальняя дата
+                        option(value='client_asc', selected=currentSort === 'client_asc') Клиент (А-Я)
+
+                .form-group(style='padding-top: 25px;')
+                    button.button(type='submit') Применить
+
+                // Кнопка сброса (перезагружает страницу без параметров)
+                .form-group(style='padding-top: 25px;')
+                    a.button.warning(href='/master/dashboard') Сброс
+            
+        p Ваши предстоящие записи (только "Запланировано" и "Подтверждено").
+        
         if bookings && bookings.length
-            .booking-list(style='display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;')
+            .booking-list.column-list
                 each booking in bookings
-                    .booking-card(style='border: 1px solid #ccc; padding: 15px; border-radius: 8px; background: #fff;')
-                        h3(style='color: #007bff; margin-top: 0;') #{booking.service_name}
-                        p.time 
-                            strong Время: 
-                            span #{booking.booking_date} в #{booking.booking_time} 
-                            span(style='font-size: 0.9em; color: #666;') (#{booking.duration_min} мин)
+                    .booking-card
+                        h3.card-title Запись №#{booking.booking_id}
+                        p 
+                            | Дата: #{booking.booking_date} в #{booking.booking_time} 
+                            span(style='margin-left: 10px;').duration-text (#{booking.duration_min} мин.)
+                        p Услуга: #{booking.service_name}
+                        p Клиент: **#{booking.client_name}** (#{booking.client_phone})
+                        p Статус: 
+                            span(class=`status-${booking.status.toLowerCase().replace(/[^a-zа-яё]/g, '')}`) #{booking.status}
                         
-                        p.client 
-                            strong Клиент: 
-                            span= booking.client_name
-                        p.phone 
-                            strong Телефон: 
-                            span= booking.client_phone
-
-                        p.status(style='font-weight: bold;') 
-                            | Статус: 
-                            span(style={ 'color': booking.status === 'Запланировано' ? 'orange' : (booking.status === 'Подтверждено' ? 'green' : 'black') })= booking.status
-                        
-                        hr
-                        
-                        // Формы для изменения статуса
-                        .status-actions(style='display: flex; gap: 10px; flex-wrap: wrap;')
-                            if booking.status !== 'Завершено'
-                                // Кнопка "Завершено"
-                                form(action=`/master/booking/status/${booking.booking_id}`, method='POST', style='display:inline;')
-                                    input(type='hidden', name='newStatus', value='Завершено')
-                                    button.button.small(type='submit', style='background: #28a745; color: white;') Завершить
-
-                            if booking.status !== 'Отменено'
-                                // Кнопка "Отменено"
-                                form(action=`/master/booking/status/${booking.booking_id}`, method='POST', style='display:inline;')
-                                    input(type='hidden', name='newStatus', value='Отменено')
-                                    button.button.small(type='submit', style='background: #dc3545; color: white;') Отменить
-                                    
+                        .status-actions
                             if booking.status === 'Запланировано'
-                                // Кнопка "Подтвердить"
-                                form(action=`/master/booking/status/${booking.booking_id}`, method='POST', style='display:inline;')
+                                form(action=`/master/booking/status/${booking.booking_id}`, method='POST', class='inline-form')
                                     input(type='hidden', name='newStatus', value='Подтверждено')
-                                    button.button.small(type='submit', style='background: #007bff; color: white;') Подтвердить
-
+                                    button.button.small.success(type='submit') Подтвердить
+                            
+                            if booking.status !== 'Завершено'
+                                form(action=`/master/booking/status/${booking.booking_id}`, method='POST', class='inline-form')
+                                    input(type='hidden', name='newStatus', value='Завершено')
+                                    button.button.small.warning(type='submit') Завершить
+                                
+                                form(action=`/master/booking/status/${booking.booking_id}`, method='POST', class='inline-form')
+                                    input(type='hidden', name='newStatus', value='Отменено')
+                                    button.button.small.danger(type='submit', onclick="return confirm('Вы уверены, что хотите отменить эту запись?')") Отменить
         else
-            p.info-message(style='padding: 15px; border: 1px solid #ddd; background: #f0f0f0; border-radius: 4px;')
-                | У вас пока нет запланированных записей.
+            p.info-message В настоящее время у вас нет предстоящих записей.

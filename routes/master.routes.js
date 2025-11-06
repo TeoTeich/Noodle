@@ -13,22 +13,35 @@ router.use(requireRole('master'));
 // -----------------------------------------
 router.get('/dashboard', async (req, res) => {
     try {
-        // 1. Находим MasterId по UserID (нужно для фильтрации записей)
+        // 1. Находим MasterId по UserID
         const masterDetails = await masterModel.getMasterDetailsByUserId(req.user.id);
         const masterId = masterDetails ? masterDetails.id : null;
 
         if (!masterId) {
-             return res.render('error', { message: 'Профиль мастера не найден.', user: req.user });
+            return res.render('error', { message: 'Профиль мастера не найден.', user: req.user });
         }
+        
+        // 2. Получаем параметры СОРТИРОВКИ и ФИЛЬТРАЦИИ
+        const sortBy = req.query.sort || 'date_asc';
+        const filterDate = req.query.date || null; 
+        const filterClientName = req.query.clientName || null; 
 
-        // 2. Получаем предстоящие записи
-        const bookings = await masterBookingModel.getUpcomingBookings(masterId);
+        // 3. Получаем записи, передавая все параметры
+        const bookings = await masterBookingModel.getMasterBookings(
+            masterId, 
+            sortBy, 
+            filterDate, 
+            filterClientName // <--- НОВЫЙ ПАРАМЕТР
+        );
         
         res.render('master/dashboard', { 
             title: 'Кабинет Мастера', 
             user: req.user,
             bookings: bookings,
             masterId: masterId,
+            currentSort: sortBy,
+            filterDate: filterDate, // <--- НОВЫЙ ПАРАМЕТР для заполнения поля
+            filterClientName: filterClientName, // <--- НОВЫЙ ПАРАМЕТР для заполнения поля
             message: req.query.message,
             error: req.query.error
         });

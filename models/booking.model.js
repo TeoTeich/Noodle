@@ -153,7 +153,7 @@ async function getClientBookings(clientId) {
         JOIN masters m ON b.master_id = m.id
         JOIN users u ON m.user_id = u.id
         WHERE b.client_user_id = ?
-        ORDER BY b.booking_date DESC, b.booking_time DESC;
+        ORDER BY b.booking_date ASC, b.booking_time ASC; 
     `;
     const [rows] = await db.execute(query, [clientId]);
     return rows;

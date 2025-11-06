@@ -1,11 +1,48 @@
-// Файл: models/master.booking.model.js
+// models/master.booking.model.js
 const db = require('../config/db');
 
 /**
- * Получает все предстоящие записи для данного мастера.
- * Предстоящие записи - это те, которые еще не завершены и не отменены.
+ * Получает предстоящие записи для мастера с опциональной сортировкой и фильтрацией.
+ * @param {number} masterId ID мастера.
+ * @param {string} sortBy Поле для сортировки ('date_asc', 'date_desc', 'client_asc').
+ * @param {string | null} filterDate Фильтр по дате (YYYY-MM-DD).
+ * @param {string | null} filterClientName Фильтр по части имени клиента.
  */
-async function getUpcomingBookings(masterId) {
+async function getMasterBookings(masterId, sortBy = 'date_asc', filterDate = null, filterClientName = null) {
+    let orderByClause = '';
+    let whereClauses = [`b.master_id = ?`, `b.status IN ('Запланировано', 'Подтверждено')`];
+    let params = [masterId];
+
+    // --- 1. ДОБАВЛЕНИЕ ФИЛЬТРОВ WHERE ---
+    
+    if (filterDate) {
+        whereClauses.push(`b.booking_date = ?`);
+        params.push(filterDate);
+    }
+
+    if (filterClientName) {
+        // Добавляем LIKE для поиска по части имени
+        whereClauses.push(`b.client_name LIKE ?`);
+        params.push(`%${filterClientName}%`);
+    }
+
+    // --- 2. ОПРЕДЕЛЕНИЕ СОРТИРОВКИ ---
+
+    switch (sortBy) {
+        case 'date_desc':
+            orderByClause = 'ORDER BY b.booking_date DESC, b.booking_time DESC';
+            break;
+        case 'client_asc':
+            orderByClause = 'ORDER BY b.client_name ASC';
+            break;
+        case 'date_asc':
+        default:
+            orderByClause = 'ORDER BY b.booking_date ASC, b.booking_time ASC';
+            break;
+    }
+    
+    // --- 3. СБОРКА ЗАПРОСА ---
+
     const query = `
         SELECT 
             b.id AS booking_id,
@@ -18,19 +55,20 @@ async function getUpcomingBookings(masterId) {
             s.duration_min
         FROM bookings b
         JOIN services s ON b.service_id = s.id
-        WHERE b.master_id = ?
-        AND b.status IN ('Запланировано', 'Подтверждено')
-        ORDER BY b.booking_date ASC, b.booking_time ASC;
+        WHERE ${whereClauses.join(' AND ')}
+        ${orderByClause};
     `;
-    const [rows] = await db.execute(query, [masterId]);
+    
+    // Выполнение запроса с динамическими параметрами
+    const [rows] = await db.execute(query, params);
     return rows;
 }
 
 /**
- * Обновляет статус конкретной записи.
+ * Обновляет статус конкретной записи. (Без изменений)
  */
 async function updateBookingStatus(bookingId, newStatus) {
-    // Простая проверка, чтобы избежать SQL-инъекций и некорректных статусов
+    // ... (код updateBookingStatus) ...
     const validStatuses = ['Запланировано', 'Подтверждено', 'Завершено', 'Отменено'];
     if (!validStatuses.includes(newStatus)) {
         throw new Error('Недопустимый статус записи.');
@@ -42,6 +80,6 @@ async function updateBookingStatus(bookingId, newStatus) {
 }
 
 module.exports = {
-    getUpcomingBookings,
+    getMasterBookings,
     updateBookingStatus
 };
