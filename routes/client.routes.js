@@ -16,7 +16,7 @@ router.get('/dashboard', async (req, res) => {
         
         // 1. Получаем параметры
         const sortBy = req.query.sort || 'date_asc'; 
-        const filterStatus = req.query.status || 'all'; // <-- НОВЫЙ ПАРАМЕТР: По умолчанию 'all'
+        const filterStatus = req.query.status || 'all'; 
         
         // 2. Используем новую функцию
         const bookings = await bookingModel.getClientBookings(clientId, sortBy, filterStatus);
@@ -26,7 +26,7 @@ router.get('/dashboard', async (req, res) => {
             user: req.user,
             bookings: bookings,
             currentSort: sortBy,
-            currentStatus: filterStatus, // <-- НОВЫЙ ПАРАМЕТР
+            currentStatus: filterStatus, 
             message: req.query.message,
             error: req.query.error
         });
@@ -52,11 +52,10 @@ router.get('/book', async (req, res) => {
         const serviceMastersIds = await serviceModel.getMasterIdsByService(serviceId);
         const allMasters = await serviceModel.getAllMasters(); 
         
-        // ИСПРАВЛЕНИЕ: Преобразование объекта для корректной передачи master_id в Pug
         masters = allMasters
             .filter(m => serviceMastersIds.includes(m.id))
             .map(m => ({
-                master_id: m.id, // <-- КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ!
+                master_id: m.id, 
                 name: m.name,
                 specialization: m.specialization 
             }));
@@ -179,8 +178,6 @@ router.post('/booking/reschedule/:id', async (req, res) => {
     }
 
     try {
-        // Здесь нужно было бы проверить, что слот свободен, но для упрощения
-        // мы просто обновляем запись. В реальной системе это критично!
         await bookingModel.rescheduleBooking(bookingId, clientId, newDate, newTime);
         res.redirect('/client/dashboard?message=Запись успешно перенесена на ' + newDate + ' ' + newTime + '.');
     } catch (error) {

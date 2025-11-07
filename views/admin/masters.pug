@@ -14,7 +14,7 @@ block content
         // ----------------------------------------
         .card
             h3 Добавить нового мастера (повысить роль)
-            p.note Введите логин **уже существующего** пользователя, чтобы назначить его мастером.
+            p.note Введите логин !уже существующего! пользователя, чтобы назначить его мастером.
             form(action='/admin/masters/add', method='POST')
                 .form-group
                     label(for='username') Логин пользователя (Username)
@@ -24,19 +24,6 @@ block content
                     input#specialization(type='text', name='specialization', required)
 
                 button.button.primary(type='submit') Назначить Мастером
-
-        // ----------------------------------------
-        // 2. ФИЛЬТРАЦИЯ МАСТЕРОВ (Форма поиска)
-        // ----------------------------------------
-        .filter-sort-controls
-            h4 Поиск мастера
-            form.filter-form(action='/admin/masters', method='GET')
-                .form-group
-                    // Предполагается, что 'searchQuery' передается в случае фильтрации
-                    label(for='search') Поиск по логину/специализации
-                    input#search(type='text', name='search', value=searchQuery || '') 
-                .form-group(style='padding-bottom: 5px;')
-                    button.button.primary(type='submit') Поиск
 
         // ----------------------------------------
         // 3. СПИСОК МАСТЕРОВ

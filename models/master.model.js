@@ -1,5 +1,4 @@
 // Файл: models/master.model.js
-console.log("MASTER MODEL IS RUNNING THE TEST VERSION V4.2.1");
 const db = require('../config/db');
 
 // ------------------------------------
@@ -115,10 +114,62 @@ async function getMasterDetailsByUserId(userId) {
     return rows.length > 0 ? rows[0] : null;
 }
 
+/**
+ * Получает записи для мастера с опциональной сортировкой.
+ * @param {number} masterId ID мастера.
+ * @param {string} sortBy Поле для сортировки ('date_asc', 'date_desc', 'client_asc').
+ */
+async function getMasterBookings(masterId, sortBy = 'date_asc') {
+    let orderByClause = '';
+
+    switch (sortBy) {
+        case 'date_desc':
+            // Новые (предстоящие) записи первыми
+            orderByClause = 'ORDER BY b.booking_date DESC, b.booking_time DESC';
+            break;
+        case 'client_asc':
+            // Сортировка по имени клиента
+            orderByClause = 'ORDER BY u_client.name ASC';
+            break;
+        case 'date_asc':
+        default:
+            // Старые (прошедшие/ближайшие) записи первыми (удобно для мастеров, чтобы видеть, что нужно сделать сейчас)
+            orderByClause = 'ORDER BY b.booking_date ASC, b.booking_time ASC';
+            break;
+    }
+    
+    // Запрос для получения записей мастера
+    const query = `
+        SELECT 
+            b.id AS booking_id,
+            b.booking_date,
+            b.booking_time,
+            b.status,
+            b.client_name,
+            b.client_phone,
+            s.name AS service_name, 
+            s.duration_min,
+            u_client.name AS client_user_name // Нужно для сортировки по имени клиента
+        FROM bookings b
+        JOIN services s ON b.service_id = s.id
+        JOIN users u_client ON b.client_user_id = u_client.id
+        WHERE b.master_id = ?
+        ${orderByClause}
+    `;
+    
+    // 1. Получаем ID пользователя-клиента, чтобы найти его имя
+    const [masterUser] = await db.execute('SELECT user_id FROM masters WHERE id = ?', [masterId]);
+    if (!masterUser.length) throw new Error('Master not found.');
+    
+    const [rows] = await db.execute(query, [masterId]);
+    return rows;
+}
+
 module.exports = {
     getAllMastersWithUserDetails,
     createMaster,
     updateMaster,
     deleteMaster,
-    getMasterDetailsByUserId
+    getMasterDetailsByUserId,
+    getMasterBookings
 };

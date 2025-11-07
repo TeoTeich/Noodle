@@ -68,7 +68,6 @@ async function getMasterBookings(masterId, sortBy = 'date_asc', filterDate = nul
  * Обновляет статус конкретной записи. (Без изменений)
  */
 async function updateBookingStatus(bookingId, newStatus) {
-    // ... (код updateBookingStatus) ...
     const validStatuses = ['Запланировано', 'Подтверждено', 'Завершено', 'Отменено'];
     if (!validStatuses.includes(newStatus)) {
         throw new Error('Недопустимый статус записи.');

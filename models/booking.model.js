@@ -146,7 +146,6 @@ async function getClientBookings(clientId, sortBy = 'date_asc', filterStatus = '
     const queryParams = [clientId];
 
     switch (sortBy) {
-        // ... (логика сортировки без изменений) ...
         case 'date_desc':
             orderByClause = 'ORDER BY b.booking_date DESC, b.booking_time DESC';
             break;

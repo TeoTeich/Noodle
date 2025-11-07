@@ -10,7 +10,6 @@ const serviceModel = require('../models/service.model');
 // =========================================================
 router.get('/', async (req, res) => {
     try {
-        // Используем заглушку из service.model.js
         const services = await serviceModel.getAllServices(); 
         res.render('index', { 
             title: 'Главная | Noodle Salon', 
@@ -39,7 +38,7 @@ router.post('/login', async (req, res) => {
     if (user && await bcrypt.compare(password, user.password_hash)) {
         req.session.userId = user.id;
         
-        // Перенаправление (либо на запрошенную страницу, либо в кабинет)
+        // Перенаправление
         const redirectUrl = req.body.returnTo && req.body.returnTo !== 'undefined'
             ? req.body.returnTo
             : '/' + user.role + '/dashboard';

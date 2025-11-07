@@ -1,7 +1,6 @@
 extends layout
 
 block content
-    // Класс .auth-form центрирует форму на странице
     .auth-form
         h2 Вход в систему
         if error
@@ -10,17 +9,13 @@ block content
         form(action='/login', method='POST')
             .form-group
                 label(for='username') Логин (Username)
-                // Используется общий стиль для input
                 input#username(type='text', name='username', required)
             
             .form-group
                 label(for='password') Пароль
-                // Используется общий стиль для input
                 input#password(type='password', name='password', required)
             
-            // Используется общий стиль кнопки .button.primary (шалфей)
             button.button.primary(type='submit') Войти
         
-        // Стиль для p и a берется из общих стилей body
         p Нет аккаунта? 
             a(href='/register') Зарегистрироваться

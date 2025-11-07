@@ -31,57 +31,73 @@ block content
                 button.button.primary(type='submit') Добавить Услугу
 
         // ----------------------------------------
-        // 2. СПИСОК УСЛУГ
+        // 2. СПИСОК УСЛУГ (R - Read / U - Update / D - Delete)
         // ----------------------------------------
         .card
             h3 Список всех услуг
-            table.data-table
+            table.data-table(style='width: 100%; border-collapse: collapse; margin-top: 20px;')
                 thead
                     tr
-                        th ID Услуги
-                        th Название
-                        th Цена
-                        th Длительность (мин)
-                        th Действия
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') ID
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Название
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Цена
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Длит. (мин)
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Мастера
+                        th(style='border: 1px solid #ddd; padding: 8px; text-align: left;') Действия
                 tbody
-                    if services && services.length
-                        each service in services
-                            - const modalId = 'editServiceModal' + service.service_id
-                            tr
-                                td= service.service_id
-                                td= service.name
-                                td= service.price
-                                td= service.duration_min
-                                td
-                                    // Кнопка, открывающая модальное окно редактирования
-                                    button.button.small.warning(onclick=`document.getElementById('${modalId}').style.display='block'`) Редактировать
-
-                                    // Форма для удаления
-                                    form(action=`/admin/services/delete/${service.service_id}`, method='POST', style='display:inline;')
-                                        button.button.small.danger(type='submit', onclick="return confirm('Вы уверены, что хотите удалить эту услугу?')") Удалить
-                            
-                            // ----------------------------------------
-                            // МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ УСЛУГИ
-                            // ----------------------------------------
-                            .modal(id=modalId)
-                                .modal-content
-                                    span.close(onclick=`document.getElementById('${modalId}').style.display='none'`) &times;
-                                    h4 Редактировать услугу: #{service.name}
-                                    form(action=`/admin/services/edit/${service.service_id}`, method='POST')
-                                        .form-group
-                                            label(for='edit_name') Название
-                                            input#edit_name(type='text', name='name', value=service.name, required)
-                                        .form-group
-                                            label(for='edit_description') Описание
-                                            input#edit_description(type='text', name='description', value=service.description, required)
-                                        .form-group
-                                            label(for='edit_price') Цена (руб.)
-                                            input#edit_price(type='number', name='price', value=service.price, required, min='0')
-                                        .form-group
-                                            label(for='edit_duration_min') Длительность (мин.)
-                                            input#edit_duration_min(type='number', name='duration_min', value=service.duration_min, required, min='10')
-                                        
-                                        button.button.primary(type='submit') Сохранить
-                    else
+                    each service in services
+                        // Используем ID услуги как часть ID для модального окна
+                        - const modalId = 'editModal' + service.id
                         tr
-                            td(colspan='5') Услуги не найдены.
+                            td(style='border: 1px solid #ddd; padding: 8px;')= service.id
+                            td(style='border: 1px solid #ddd; padding: 8px;')= service.name
+                            td(style='border: 1px solid #ddd; padding: 8px;')= service.price
+                            td(style='border: 1px solid #ddd; padding: 8px;')= service.duration_min
+                            // Отображение имен мастеров
+                            td(style='border: 1px solid #ddd; padding: 8px;')
+                                -
+                                    const assignedMasterNames = masters
+                                        .filter(m => service.masterIds.includes(m.id))
+                                        .map(m => m.name)
+                                        .join(', ');
+                                if assignedMasterNames
+                                    | #{assignedMasterNames}
+                                else
+                                    | (Нет)
+                            td(style='border: 1px solid #ddd; padding: 8px;')
+                                // Кнопка, открывающая модальное окно редактирования
+                                button.button.small(onclick=`document.getElementById('${modalId}').style.display='block'`, style='margin-right: 5px; background: #f39c12; color: white;') Редактировать
+                                
+                                // Форма для удаления
+                                form(action=`/admin/services/delete/${service.id}`, method='POST', style='display:inline;')
+                                    button.button.small.danger(type='submit', onclick="return confirm('Вы уверены, что хотите удалить эту услугу?')", style='background: #e74c3c; color: white;') Удалить
+
+                        // ----------------------------------------
+                        // МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ (U - Update)
+                        // ----------------------------------------
+                        .modal(id=modalId, style='display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);')
+                            .modal-content(style='background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;')
+                                span.close(onclick=`document.getElementById('${modalId}').style.display='none'`, style='color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;') &times;
+                                h4 Редактировать услугу: #{service.name}
+
+                                form(action=`/admin/services/edit/${service.id}`, method='POST')
+                                    .form-group
+                                        label(for=`name-${service.id}`) Название
+                                        input(type='text', name='name', value=service.name, required, id=`name-${service.id}`)
+                                    .form-group
+                                        label(for=`price-${service.id}`) Цена (руб.)
+                                        input(type='number', name='price', step='0.01', min='0', value=service.price, required, id=`price-${service.id}`)
+                                    .form-group
+                                        label(for=`duration-${service.id}`) Длительность (мин.)
+                                        input(type='number', name='duration_min', min='1', value=service.duration_min, required, id=`duration-${service.id}`)
+                                    
+                                    .form-group
+                                        label Мастера
+                                        div(style='display: flex; flex-wrap: wrap; gap: 15px;')
+                                            each master in masters
+                                                - const isChecked = service.masterIds.includes(master.id)
+                                                label.checkbox-label(style='display: flex; align-items: center; cursor: pointer;')
+                                                    input(type='checkbox', name='master_ids', value=master.id, checked=isChecked, style='margin-right: 5px;')
+                                                    span= master.name
+
+                                    button.button(type='submit') Сохранить изменения

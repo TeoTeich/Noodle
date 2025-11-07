@@ -31,7 +31,7 @@ router.get('/dashboard', async (req, res) => {
             masterId, 
             sortBy, 
             filterDate, 
-            filterClientName // <--- НОВЫЙ ПАРАМЕТР
+            filterClientName 
         );
         
         res.render('master/dashboard', { 
@@ -40,8 +40,8 @@ router.get('/dashboard', async (req, res) => {
             bookings: bookings,
             masterId: masterId,
             currentSort: sortBy,
-            filterDate: filterDate, // <--- НОВЫЙ ПАРАМЕТР для заполнения поля
-            filterClientName: filterClientName, // <--- НОВЫЙ ПАРАМЕТР для заполнения поля
+            filterDate: filterDate, 
+            filterClientName: filterClientName, 
             message: req.query.message,
             error: req.query.error
         });
